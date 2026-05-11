@@ -14,12 +14,27 @@ app.post('/shorten', (req, res) => {
     //
 })
 
-app.put('/shorten/:id', (req, res) => {
+app.put('/shorten/:id', async(req, res) => {
+//UPDATE table_name SET column1 = value1, column2 = value2 WHERE condition;
+    const id = req.params.id
+    const exists = await db.oneOrNone('SELECT * FROM urls WHERE id = $1', id)
+
+    if(!exists) return res.status(404).send()
+
+    const copy = await db.oneOrNone('SELECT * FROM urls WHERE shorturl = $1', req.body.shortUrl)
+    if(copy) return res.status(400).send()
+    
+    const updated = await db.oneOrNone('UPDATE urls SET shorturl = $1 WHERE id = $2 RETURNING *', [req.body.shortUrl, id])
+    if(updated) return res.status(200).json(updated)
+    
+    return res.status(400).send() 
 
 })
 
-app.delete('/shorten/:id', (req, res) => {
-
+app.delete('/shorten/:id', async(req, res) => {
+    const id = req.params.id
+    const deleted = await db.oneOrNone('DELETE FROM urls WHERE id = $1', id)
+    deleted ? res.status(204).send() : res.status(404).send()
 })
 
 app.get('/shorten/:id/stats', async(req, res) => {

@@ -10,7 +10,7 @@ CREATE TABLE urls (
 );
 
 CREATE TABLE clicks (
-  urlId uuid REFERENCES urls(id),
+  urlId uuid REFERENCES urls(id) ON DELETE CASCADE,
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
