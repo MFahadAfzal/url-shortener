@@ -5,6 +5,7 @@ const {toBase62} = require('./utils.js')
 
 const db = pgp(process.env.DATABASE_URL)
 const app = express()
+app.use(express.json())
 
 const port = process.env.PORT || 3000
 
@@ -12,8 +13,12 @@ app.get('/', (req, res) => {
   res.send("Hello World!")
 })
 
-app.post('/shorten', (req, res) => {
-    //
+//setting up new row and creating shortUrl
+app.post('/shorten', async(req, res) => {
+    const row = await db.oneOrNone('INSERT INTO urls (longurl) VALUES ($1) RETURNING *', req.body.longurl)
+    const shortUrl = `${process.env.BASE_URL}/${toBase62(row.id)}`
+    const updated = await db.oneOrNone('UPDATE urls SET shorturl = $1 WHERE id = $2 RETURNING *', [shortUrl, row.id])
+    res.status(201).json(updated)
 })
 
 
@@ -38,7 +43,7 @@ app.put('/shorten/:id', async(req, res) => {
 //deleting shorturl
 app.delete('/shorten/:id', async(req, res) => {
     const id = req.params.id
-    const deleted = await db.oneOrNone('DELETE FROM urls WHERE id = $1', id)
+    const deleted = await db.oneOrNone('DELETE FROM urls WHERE id = $1 RETURNING *', id)
     deleted ? res.status(204).send() : res.status(404).send()
 })
 
@@ -46,8 +51,9 @@ app.delete('/shorten/:id', async(req, res) => {
 //getting all the statistics for the shorturl
 app.get('/shorten/:id/stats', async(req, res) => {
     const id = req.params.id
-    const clicksData = await db.many('SELECT * FROM clicks WHERE urlid = $1', id)
-    const urlData = await db.one('SELECT * FROM urls WHERE id = $1', id)
+    const clicksData = await db.manyOrNone('SELECT * FROM clicks WHERE urlid = $1', id)
+    const urlData = await db.oneOrNone('SELECT * FROM urls WHERE id = $1', id)
+    if (!urlData) return res.status(404).json({ error: 'Short URL not found' })
     return res.json({clicksData, urlData})
 })
 
@@ -64,6 +70,7 @@ app.get('/:code', async(req, res) => {
 
 //To catch unexpected errors
 app.use((err, req, res, next) => {
+    console.error(err)
     res.status(500).json({ error: 'Server error' })
 })
 
