@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 function toBase62(id){
     const CHARS = process.env.CHARS
     let result = ''
