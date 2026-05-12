@@ -16,8 +16,8 @@ app.get('/', (req, res) => {
 //setting up new row and creating shortUrl
 app.post('/shorten', async(req, res) => {
     const row = await db.oneOrNone('INSERT INTO urls (longurl) VALUES ($1) RETURNING *', req.body.longurl)
-    const shortUrl = `${process.env.BASE_URL}/${toBase62(row.id)}`
-    const updated = await db.oneOrNone('UPDATE urls SET shorturl = $1 WHERE id = $2 RETURNING *', [shortUrl, row.id])
+    const code = toBase62(row.id)
+    const updated = await db.oneOrNone('UPDATE urls SET shorturl = $1 WHERE id = $2 RETURNING *', [code, row.id])
     res.status(201).json(updated)
 })
 
