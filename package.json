@@ -1,7 +1,7 @@
 {
   "name": "url-shortener",
   "version": "1.0.0",
-  "description": "",
+  "description": "A full stack URL shortening service built with React, Node.js, Express, and PostgreSQL.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -24,6 +24,10 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "pg-promise": "^12.6.2",
+    "playwright": "^1.60.0",
     "tailwindcss": "^4.3.0"
+  },
+  "directories": {
+    "test": "tests"
   }
 }

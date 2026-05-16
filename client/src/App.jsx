@@ -35,7 +35,7 @@ function App() {
             <p className="text-xs text-gray-400 mb-1">Your short URL</p>
             
             <div className="flex items-center justify-between gap-3">
-              <span className="text-blue-500 text-sm font-medium break-all">{shortUrl}</span>
+              <span data-testid="short-url" className="text-blue-500 text-sm font-medium break-all">{shortUrl}</span>
               <button className="text-xs text-gray-500 hover:text-gray-700 flex-shrink-0">Copy</button>
             </div>
           
