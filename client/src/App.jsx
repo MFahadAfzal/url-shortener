@@ -22,7 +22,7 @@ function App() {
       <div style={{ width: '100%', maxWidth: '520px' }}>
         
         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          <h1 className="text-2xl font-medium mb-2">Shortly</h1>
+          <h1 className="text-2xl font-medium mb-2">Slim Link</h1>
           <p className="text-sm text-gray-500">Paste a long URL and get a short one instantly.</p>
         </div>
         
