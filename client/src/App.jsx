@@ -8,6 +8,10 @@ function App() {
   const [expiryDate, setExpiryDate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const minDate = tomorrow.toISOString().split('T')[0]
+
   const genShortUrl = async() => {
       setErrorMessage('')
       let url = longUrl
@@ -47,7 +51,7 @@ function App() {
           <input value={longUrl} onChange={e => setLongUrl(e.target.value)} type="text" placeholder="https://example.com/your/very/long/url" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400" />
           
           <label className="block text-xs text-gray-500 mb-1">Expiry date <span className="text-xs text-gray-400">(optional)</span></label>
-          <input type="date" min={new Date().toISOString().split('T')[0]} value={expiryDate} onChange={e => setExpiryDate(e.target.value)}/>
+          <input type="date" min={minDate} value={expiryDate} onChange={e => setExpiryDate(e.target.value)}/>
           
           <button onClick={() => genShortUrl()} className="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600">Shorten URL</button>
           
