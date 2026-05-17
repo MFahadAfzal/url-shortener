@@ -8,8 +8,10 @@ const home = (req, res) => {
 //setting up new row and creating shortUrl
 const create = async (req, res) => {
     const row = await db.oneOrNone('INSERT INTO urls (longurl, expires_at) VALUES ($1, $2) RETURNING *', [req.body.longurl,req.body.expires_at || null])
+    console.log(row)
     const code = toBase62(row.id)
     const updated = await db.oneOrNone('UPDATE urls SET shorturl = $1 WHERE id = $2 RETURNING *', [code, row.id])
+    console.log(updated)
     res.status(201).json(updated)
 }
 

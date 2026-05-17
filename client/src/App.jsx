@@ -5,21 +5,28 @@ const baseUrl = import.meta.env.VITE_API_URL
 function App() {
   const [longUrl, setLongUrl] = useState('')
   const [shortUrl, setShortUrl] = useState('Nothing Yet')
-  const [expiryDate, setExpiryDate] = useState('dd/mm/yyyy')
+  const [expiryDate, setExpiryDate] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const genShortUrl = async() => {
+      setErrorMessage('')
       let url = longUrl
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = `https://${url}`
       }
-      
-      const body = {longurl: url}
+      if(URL.canParse(url)){
+        const body = {longurl: url}
 
-      if(expiryDate === ''){
-        body.expires_at = expiryDate
+        if(expiryDate !== ''){
+          body.expires_at = expiryDate
+        }
+        const data = await api.create(body)
+        setShortUrl(`${baseUrl}/${data.shorturl}`)
+
+      }else{
+        setErrorMessage("Please enter a URL")
       }
-      const data = await api.create(body)
-      setShortUrl(`${baseUrl}/${data.shorturl}`)
+      
   }
 
   return (
@@ -33,6 +40,9 @@ function App() {
         </div>
         
         <div className="bg-white rounded-xl border border-gray-200 p-6">
+
+          {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
+
           <label className="block text-xs text-gray-500 mb-1">Long URL</label>
           <input value={longUrl} onChange={e => setLongUrl(e.target.value)} type="text" placeholder="https://example.com/your/very/long/url" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400" />
           
