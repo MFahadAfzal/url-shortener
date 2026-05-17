@@ -5,13 +5,19 @@ const baseUrl = import.meta.env.VITE_API_URL
 function App() {
   const [longUrl, setLongUrl] = useState('')
   const [shortUrl, setShortUrl] = useState('Nothing Yet')
+  const [expiryDate, setExpiryDate] = useState('dd/mm/yyyy')
 
   const genShortUrl = async() => {
       let url = longUrl
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = `https://${url}`
       }
+      
       const body = {longurl: url}
+
+      if(expiryDate === ''){
+        body.expires_at = expiryDate
+      }
       const data = await api.create(body)
       setShortUrl(`${baseUrl}/${data.shorturl}`)
   }
@@ -29,6 +35,10 @@ function App() {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <label className="block text-xs text-gray-500 mb-1">Long URL</label>
           <input value={longUrl} onChange={e => setLongUrl(e.target.value)} type="text" placeholder="https://example.com/your/very/long/url" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          
+          <label className="block text-xs text-gray-500 mb-1">Expiry date <span className="text-xs text-gray-400">(optional)</span></label>
+          <input type="date" min={new Date().toISOString().split('T')[0]} value={expiryDate} onChange={e => setExpiryDate(e.target.value)}/>
+          
           <button onClick={() => genShortUrl()} className="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-600">Shorten URL</button>
           
           <div className="mt-4 p-4 bg-gray-50 rounded-lg">

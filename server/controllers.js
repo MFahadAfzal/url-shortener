@@ -7,7 +7,7 @@ const home = (req, res) => {
 
 //setting up new row and creating shortUrl
 const create = async (req, res) => {
-    const row = await db.oneOrNone('INSERT INTO urls (longurl) VALUES ($1) RETURNING *', req.body.longurl)
+    const row = await db.oneOrNone('INSERT INTO urls (longurl, expires_at) VALUES ($1, $2) RETURNING *', [req.body.longurl,req.body.expires_at || null])
     const code = toBase62(row.id)
     const updated = await db.oneOrNone('UPDATE urls SET shorturl = $1 WHERE id = $2 RETURNING *', [code, row.id])
     res.status(201).json(updated)
@@ -48,8 +48,16 @@ const getStats = async (req, res) => {
 //basic function to redirect user to long url
 const redirect = async (req, res) => {
     const shortUrl = req.params.code
-    const data = await db.oneOrNone('SELECT id, longurl FROM urls WHERE shorturl = $1', shortUrl)
+    const now = new Date()
+    const data = await db.oneOrNone('SELECT id, longurl, expires_at FROM urls WHERE shorturl = $1', shortUrl)
     if (!data) return res.status(404).json({ error: 'Short URL not found' })
+    
+    if(data.expires_at){
+        if (now > data.expires_at){
+            res.redirect(process.env.FRONTEND_URL)
+        }
+    }
+
     await db.none('INSERT INTO clicks (urlid) VALUES ($1)', data.id)
     res.redirect(data.longurl)
 }
