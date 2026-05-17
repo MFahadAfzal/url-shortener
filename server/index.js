@@ -1,6 +1,12 @@
+require('dotenv').config({ path: '../.env' })
+
 const express = require('express')
 const app = express()
-require('dotenv').config({ path: '../.env' })
+
+const limiter = require('./middleware')
+app.use(limiter)
+
+
 const urlRoutes = require('./routes')
 const cors = require('cors')
 app.use(cors())
