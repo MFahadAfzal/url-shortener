@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import Charts from '../components/Charts'
 import api from '../services/api'
 
 function Analytics(){
     const [data, setData] = useState(null)
+    const [chartData, setChartData] = useState(null)
     const [id, setId] = useState('')
     const { code } = useParams()
     const [inputUrl, setInputUrl] = useState(code || '')
     const [errorMessage, setErrorMessage] = useState('')
     const navigate = useNavigate()
+
 
     const short = () => {
         setErrorMessage('')
@@ -28,6 +31,21 @@ function Analytics(){
                 console.log(api)
                 const result = await api.stats(code)
                 setData(result)
+                
+                //this is too get the dates and the amount of times it was clicked on that day so i can pass it to charts
+                const dateCount = result.clicksData.reduce((acc, obj) =>{
+                    const date = new Date(obj.accessed).toLocaleDateString()
+                    if (acc[date]){
+                        acc[date] = acc[date] + 1
+                    }else {
+                        acc[date] = 1
+                    }
+                    return acc
+                }, {})
+                
+                const formattedData = Object.entries(dateCount).map(([date, clicks]) => ({date, clicks}))
+
+                setChartData(formattedData)
                 
             }
             fetchStats()
@@ -62,8 +80,12 @@ function Analytics(){
                 </div>
             </div>
 
-            <div className="flex-1 bg-white rounded-xl border border-gray-500 p-6 mx-2 mb-1">
-                {data ? <div>...stats here...</div> : <h1 className="text-center text-gray-400 text-xl mt-20">Enter a short URL to see analytics</h1>}
+            <div className="flex-1 bg-white rounded-xl border border-gray-500 p-6 mx-2 mb-1 ">
+                {data ? <div className='flex '>
+                    <div className='flex-1 '><Charts clicksData={chartData}/></div>
+                </div> : 
+                
+                <h1 className="text-center text-gray-400 text-xl mt-20">Enter a short URL to see analytics</h1>}
             </div>
         </div>
     )
