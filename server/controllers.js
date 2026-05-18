@@ -40,10 +40,12 @@ const remove = async (req, res) => {
 
 //getting all the statistics for the shorturl
 const getStats = async (req, res) => {
-    const id = req.params.id
-    const clicksData = await db.manyOrNone('SELECT * FROM clicks WHERE urlid = $1', id)
-    const urlData = await db.oneOrNone('SELECT * FROM urls WHERE id = $1', id)
+    const shortUrl = req.params.code
+    const urlData = await db.oneOrNone('SELECT * FROM urls WHERE shorturl = $1', shortUrl)
     if (!urlData) return res.status(404).json({ error: 'Short URL not found' })
+
+    const clicksData = await db.manyOrNone('SELECT * FROM clicks WHERE urlid = $1', urlData.id)
+ 
     return res.json({clicksData, urlData})
 }
 
