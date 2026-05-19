@@ -2,7 +2,6 @@ import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis, Responsi
 
 function Charts({clicksData}) {
   
-    console.log(clicksData)
     
     return (
         <ResponsiveContainer width="100%" aspect={2}> 

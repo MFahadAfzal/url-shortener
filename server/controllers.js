@@ -8,10 +8,10 @@ const home = (req, res) => {
 //setting up new row and creating shortUrl
 const create = async (req, res) => {
     const row = await db.oneOrNone('INSERT INTO urls (longurl, expires_at) VALUES ($1, $2) RETURNING *', [req.body.longurl,req.body.expires_at || null])
-    console.log(row)
+
     const code = toBase62(row.id)
     const updated = await db.oneOrNone('UPDATE urls SET shorturl = $1 WHERE id = $2 RETURNING *', [code, row.id])
-    console.log(updated)
+
     res.status(201).json(updated)
 }
 
@@ -63,11 +63,11 @@ const redirect = async (req, res) => {
     }
 
     //getting ip address for geolocation purposes. have req.ip for internal testing and x-forwarded-for for when its deployed
-    const ip = (req.headers['x-forwarded-for'] || req.ip).split(',')[0].trim()
+    const ip = process.env.NODE_ENV === 'production' 
+    ? (req.headers['x-forwarded-for'] || req.ip).split(',')[0].trim()
+    : '1.1.1.1'
     
     const response = await(await fetch(`http://ip-api.com/json/${ip}`)).json()
-
-    console.log(response)
 
     if (response.status === 'success') {
         await db.none('INSERT INTO clicks (urlid, country, lat, lon) VALUES ($1, $2, $3, $4)', [data.id, response.country, response.lat, response.lon])
