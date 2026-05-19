@@ -28,25 +28,29 @@ function Analytics(){
     useEffect(() => {
         if (code) {
             const fetchStats = async() =>{
-                console.log(api)
-                const result = await api.stats(code)
-                setData(result)
-                
-                //this is too get the dates and the amount of times it was clicked on that day so i can pass it to charts
-                const dateCount = result.clicksData.reduce((acc, obj) =>{
-                    const date = new Date(obj.accessed).toLocaleDateString()
-                    if (acc[date]){
-                        acc[date] = acc[date] + 1
-                    }else {
-                        acc[date] = 1
-                    }
-                    return acc
-                }, {})
-                
-                const formattedData = Object.entries(dateCount).map(([date, clicks]) => ({date, clicks}))
 
-                setChartData(formattedData)
+                const result = await api.stats(code)
                 
+                if(result.error){
+                    setErrorMessage("Short Url does not exist")
+                }else{
+                    setData(result)
+                    
+                    //this is too get the dates and the amount of times it was clicked on that day so i can pass it to charts
+                    const dateCount = result.clicksData.reduce((acc, obj) =>{
+                        const date = new Date(obj.accessed).toLocaleDateString()
+                        if (acc[date]){
+                            acc[date] = acc[date] + 1
+                        }else {
+                            acc[date] = 1
+                        }
+                        return acc
+                    }, {})
+                    
+                    const formattedData = Object.entries(dateCount).map(([date, clicks]) => ({date, clicks}))
+
+                    setChartData(formattedData)
+                }
             }
             fetchStats()
         }

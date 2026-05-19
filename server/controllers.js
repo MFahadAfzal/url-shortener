@@ -58,11 +58,23 @@ const redirect = async (req, res) => {
     
     if(data.expires_at){
         if (now > data.expires_at){
-            res.redirect(process.env.FRONTEND_URL)
+            return res.redirect(process.env.FRONTEND_URL)
         }
     }
 
-    await db.none('INSERT INTO clicks (urlid) VALUES ($1)', data.id)
+    //getting ip address for geolocation purposes. have req.ip for internal testing and x-forwarded-for for when its deployed
+    const ip = req.headers['x-forwarded-for'] || req.ip
+    
+    const response = await(await fetch(`http://ip-api.com/json/${ip}`)).json()
+
+    console.log(response)
+    
+    if (response.status === 'success') {
+        await db.none('INSERT INTO clicks (urlid, country, lat, lon) VALUES ($1, $2, $3, $4)', [data.id, response.country, response.lat, response.lon])
+    } else {
+        await db.none('INSERT INTO clicks (urlid) VALUES ($1)', [data.id])
+    }
+
     res.redirect(data.longurl)
 }
 
