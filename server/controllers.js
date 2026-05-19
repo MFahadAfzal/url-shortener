@@ -63,12 +63,12 @@ const redirect = async (req, res) => {
     }
 
     //getting ip address for geolocation purposes. have req.ip for internal testing and x-forwarded-for for when its deployed
-    const ip = req.headers['x-forwarded-for'] || req.ip
+    const ip = (req.headers['x-forwarded-for'] || req.ip).split(',')[0].trim()
     
     const response = await(await fetch(`http://ip-api.com/json/${ip}`)).json()
 
     console.log(response)
-    
+
     if (response.status === 'success') {
         await db.none('INSERT INTO clicks (urlid, country, lat, lon) VALUES ($1, $2, $3, $4)', [data.id, response.country, response.lat, response.lon])
     } else {
