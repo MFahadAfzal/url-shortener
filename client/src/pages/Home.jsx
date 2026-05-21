@@ -18,7 +18,7 @@ function Home() {
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = `https://${url}`
       }
-      if(URL.canParse(url)){
+      if (URL.canParse(url) && new URL(url).hostname.includes('.')) {
         const body = {longurl: url}
 
         if(expiryDate !== ''){
