@@ -38,6 +38,12 @@ test('create short url with expiration', async ({ page }) => {
   await expect(page).toHaveTitle(/Google/)
 });
 
+//trying to go to an expired short url link
+test('expired url redirects', async ({ page }) => {
+    await page.goto(`${process.env.BASE_URL}/expired`)
+    await expect(page).toHaveURL(process.env.FRONTEND_URL)
+})
+
 //test to see if an incorrect input into url shortener will return proper error
 test('invalid long url', async ({ page }) => {
   await page.goto(`${process.env.FRONTEND_URL}`);
