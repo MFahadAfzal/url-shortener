@@ -54,3 +54,36 @@ test('invalid long url', async ({ page }) => {
 
   await expect(page.getByText('Please enter a URL')).toBeVisible()
 });
+
+//empty input test
+test('empty input shows error', async ({ page }) => {
+    await page.goto(`${process.env.FRONTEND_URL}`)
+    
+    await page.getByRole('button', { name: 'Shorten URL' }).click()
+    
+    await expect(page.getByText('Please enter a URL')).toBeVisible()
+})
+
+
+//checking to see if it detect just https:// is a invalid url
+test('url with just protocol shows error', async ({ page }) => {
+    await page.goto(`${process.env.FRONTEND_URL}`)
+    
+    await page.getByPlaceholder('https://example.com/your/very/long/url').fill('https://')
+    
+    await page.getByRole('button', { name: 'Shorten URL' }).click()
+    
+    await expect(page.getByText('Please enter a URL')).toBeVisible()
+})
+
+//rate limit test
+test('rate limiting triggers after 30 requests', async ({ page }) => {
+    await page.goto(`${process.env.FRONTEND_URL}`)
+    
+    for (let i = 0; i < 31; i++) {
+        await page.getByPlaceholder('https://example.com/your/very/long/url').fill('google.com')
+        await page.getByRole('button', { name: 'Shorten URL' }).click()
+    }
+    
+    await expect(page.getByText('Too many requests')).toBeVisible()
+})

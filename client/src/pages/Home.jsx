@@ -24,8 +24,18 @@ function Home() {
         if(expiryDate !== ''){
           body.expires_at = expiryDate
         }
-        const data = await api.create(body)
-        setShortUrl(`${baseUrl}/${data.shorturl}`)
+        try {
+            const data = await api.create(body)
+            setShortUrl(`${baseUrl}/${data.shorturl}`)
+        } catch (error) {
+            console.log('error status:', error.status)
+            console.log('full error:', error)
+            if (error.status === 429) {
+                setErrorMessage('Too many requests. Please wait a minute.')
+            } else {
+                setErrorMessage('Something went wrong. Please try again.')
+            }
+        }
 
       }else{
         setErrorMessage("Please enter a URL")

@@ -6,6 +6,11 @@ const create = async(data) => {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     })
+    if (!response.ok) {
+        const error = new Error('Request failed')
+        error.status = response.status
+        throw error
+    }
     return response.json()
 }
 
