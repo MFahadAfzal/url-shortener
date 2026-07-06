@@ -4,7 +4,7 @@ A full-stack URL shortening service with click analytics, geolocation tracking, 
 
 🔗 **Live Demo:** https://url-shortener-ejyr.onrender.com
 
-Please wait 30 second after first clicking sign in as I am using a render to deploy my website and it takes 30-60 seconds to start the server
+Please wait 30-60 second after first clicking to generate url as I am using a render to deploy my website and it takes 30-60 seconds to start the server
 
 ![Home Page](screenshots/home.png)
 ![Analytics Dashboard](screenshots/analytics.png)
